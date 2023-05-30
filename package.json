@@ -1,0 +1,25 @@
+{
+  "name": "entregable",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/francaceres/ch-backend-desafio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/francaceres/ch-backend-desafio/issues"
+  },
+  "homepage": "https://github.com/francaceres/ch-backend-desafio#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

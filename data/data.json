@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "Mouse",
+    "description": "Alto mouse",
+    "price": 3500,
+    "thumbnail": "link",
+    "code": "MS1",
+    "stock": 100
+  },
+  {
+    "id": 2,
+    "title": "Teclado",
+    "description": "Un buen teclado",
+    "price": 5000,
+    "thumbnail": "link",
+    "code": "KB1",
+    "stock": 100
+  },
+  {
+    "id": 3,
+    "title": "Teclado 2.0",
+    "description": "Un teclado más o menos",
+    "price": 3000,
+    "thumbnail": "link",
+    "code": "KB2",
+    "stock": 100
+  }
+]

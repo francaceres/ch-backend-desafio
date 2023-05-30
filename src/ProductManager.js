@@ -1,10 +1,10 @@
-const fs = require("fs");
+import { promises } from "fs";
 
-class ProductManager {
+export default class ProductManager {
   #path;
 
-  constructor() {
-    this.#path = "data.json";
+  constructor(path) {
+    this.#path = path;
   }
 
   addProduct = async (title, description, price, thumbnail, code, stock) => {
@@ -30,41 +30,35 @@ class ProductManager {
       if (codeCheck) {
         return "Error: ya existe un producto con ese código";
       }
-      await fs.promises.writeFile(
+      await promises.writeFile(
         this.#path,
         JSON.stringify([...data, product]),
         "utf-8"
       );
     } else {
-      await fs.promises.writeFile(
-        this.#path,
-        JSON.stringify([product]),
-        "utf-8"
-      );
+      await promises.writeFile(this.#path, JSON.stringify([product]), "utf-8");
     }
 
     return "Éxito";
   };
 
   getProducts = async () => {
-    return await fs.promises
-      .readFile(this.#path, "utf-8")
-      .then((res) => {
-        return JSON.parse(res);
-      })
-      .catch(() => {
-        return false;
-      });
+    try {
+      const data = await promises.readFile(this.#path, "utf-8");
+      return JSON.parse(data);
+    } catch (error) {
+      return error;
+    }
   };
 
   getProductById = async (id) => {
     const data = await this.getProducts();
     for (let product of data) {
-      if (product.id === id) {
+      if (product.id == id) {
         return product;
       }
     }
-    return "Error: no hay ningún producto con ese id";
+    return { error: "No hay ningún producto con ese id" };
   };
 
   updateProduct = async (id, newProduct) => {
@@ -73,7 +67,7 @@ class ProductManager {
       if (product.id === id) {
         const index = data.indexOf(product);
         data[index] = newProduct;
-        await fs.promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
+        await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
         return "Éxito";
       }
     }
@@ -86,7 +80,7 @@ class ProductManager {
       if (product.id === id) {
         const index = data.indexOf(product);
         data.splice(index, 1);
-        await fs.promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
+        await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
         return "Éxito";
       }
     }
@@ -97,7 +91,14 @@ class ProductManager {
 // const consultas = async () => {
 //   const manager = new ProductManager();
 //   console.log(
-//     await manager.addProduct("Mouse", "Alto mouse", 3500, "link", "MS2", 100)
+//     await manager.addProduct(
+//       "Teclado 2.0",
+//       "Un teclado más o menos",
+//       3000,
+//       "link",
+//       "KB2",
+//       100
+//     )
 //   );
 
 //   console.log(await manager.getProductById(2));
