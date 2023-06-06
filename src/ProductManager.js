@@ -7,17 +7,18 @@ export default class ProductManager {
     this.#path = path;
   }
 
-  addProduct = async (title, description, price, thumbnail, code, stock) => {
+  addProduct = async (body) => {
     const data = await this.getProducts();
 
     const product = {
       id: data.length + 1 || 1,
-      title: title,
-      description: description,
-      price: price,
-      thumbnail: thumbnail,
-      code: code,
-      stock: stock,
+      title: body.title,
+      description: body.description,
+      price: body.price,
+      status: body.status || true,
+      thumbnails: body.thumbnails || [],
+      code: body.code,
+      stock: body.stock,
     };
     for (const prop in product) {
       if (!product[prop]) {
@@ -53,71 +54,37 @@ export default class ProductManager {
 
   getProductById = async (id) => {
     const data = await this.getProducts();
-    for (let product of data) {
-      if (product.id == id) {
-        return product;
-      }
+    const product = data.find((prod) => prod.id == id);
+    if (product) {
+      return product;
+    } else {
+      return { error: "No hay ningún producto con ese id" };
     }
-    return { error: "No hay ningún producto con ese id" };
   };
 
-  updateProduct = async (id, newProduct) => {
+  updateProduct = async (id, properties) => {
     const data = await this.getProducts();
-    for (let product of data) {
-      if (product.id === id) {
-        const index = data.indexOf(product);
-        data[index] = newProduct;
-        await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
-        return "Éxito";
-      }
+    const product = data.find((prod) => prod.id == id);
+    if (product) {
+      const index = data.indexOf(product);
+      data[index] = Object.assign(data[index], properties);
+      await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
+      return "Éxito";
+    } else {
+      return "Error: no hay ningún producto con ese id";
     }
-    return "Error: no hay ningún producto con ese id";
   };
 
   deleteProduct = async (id) => {
     const data = await this.getProducts();
-    for (let product of data) {
-      if (product.id === id) {
-        const index = data.indexOf(product);
-        data.splice(index, 1);
-        await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
-        return "Éxito";
-      }
+    const product = data.find((prod) => product.id == id);
+    if (product) {
+      const index = data.indexOf(product);
+      data.splice(index, 1);
+      await promises.writeFile(this.#path, JSON.stringify(data), "utf-8");
+      return "Éxito";
+    } else {
+      return "Error: no hay ningún producto con ese id";
     }
-    return "Error: no hay ningún producto con ese id";
   };
 }
-
-// const consultas = async () => {
-//   const manager = new ProductManager();
-//   console.log(
-//     await manager.addProduct(
-//       "Teclado 2.0",
-//       "Un teclado más o menos",
-//       3000,
-//       "link",
-//       "KB2",
-//       100
-//     )
-//   );
-
-//   console.log(await manager.getProductById(2));
-
-//   const productos = await manager.getProducts();
-//   if (productos) console.log(productos);
-//   else console.log("No hay productos");
-
-//   await manager.updateProduct(1, {
-//     id: 1,
-//     title: "Mouse 2.0",
-//     description: "Bajo mouse",
-//     price: 2000,
-//     thumbnail: "link",
-//     code: "MS2.0",
-//     stock: 100,
-//   });
-
-//   console.log(await manager.deleteProduct(1));
-// };
-
-// consultas();
