@@ -77,7 +77,7 @@ export default class ProductManager {
 
   deleteProduct = async (id) => {
     const data = await this.getProducts();
-    const product = data.find((prod) => product.id == id);
+    const product = data.find((prod) => prod.id == id);
     if (product) {
       const index = data.indexOf(product);
       data.splice(index, 1);

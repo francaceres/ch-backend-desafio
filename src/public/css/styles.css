@@ -1,0 +1,12 @@
+.productsContainer {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 15px;
+}
+
+.product {
+  border: solid 2px black;
+  text-align: center;
+  padding: 15px;
+  width: 100%;
+}
