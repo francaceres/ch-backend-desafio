@@ -1,18 +1,28 @@
 import { Router } from "express";
-import ProductManager from "../ProductManager.js";
+import ProductManager from "../dao/mongo/manager/products.js";
+import MessageManager from "../dao/mongo/manager/messages.js";
 
 const router = Router();
 
-const products = new ProductManager("./data/products.json");
+const productsManager = new ProductManager();
+const messagesManager = new MessageManager();
 
-router.get("/", async (req, res) => {
-  const data = await products.getProducts();
-  res.render("home", { products: data, style: "styles.css" });
-});
+const viewsRouter = (io) => {
+  router.get("/", async (req, res) => {
+    const data = await productsManager.getProducts();
+    res.render("home", { products: data, style: "styles.css" });
+  });
 
-router.get("/realtimeproducts", async (req, res) => {
-  const data = await products.getProducts();
-  res.render("realTimeProducts", { products: data, style: "styles.css" });
-});
+  router.get("/realtimeproducts", async (req, res) => {
+    const data = await productsManager.getProducts();
+    res.render("realTimeProducts", { products: data, style: "styles.css" });
+  });
 
-export default router;
+  router.route("/chat").get(async (req, res) => {
+    res.render("chat", { style: "styles.css" });
+  });
+
+  return router;
+};
+
+export default viewsRouter;
