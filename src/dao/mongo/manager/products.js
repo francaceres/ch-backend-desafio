@@ -5,6 +5,10 @@ export default class ProductManager {
     return productModel.find().lean();
   };
 
+  paginateProducts = (limit, page, filter, sort) => {
+    return productModel.paginate(filter, { limit, page, sort, lean: true });
+  };
+
   getProductById = (id) => {
     return productModel.findById(id);
   };

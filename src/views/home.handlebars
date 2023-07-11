@@ -4,11 +4,22 @@
     {{#each products}}
       <div class="product">
         <h2>{{this.title}} - {{this._id}}</h2>
+        <h3>{{this.category}}</h3>
         <p>{{this.description}}</p>
         <h3>${{this.price}}</h3>
         <h3>Code: {{this.code}}</h3>
         <h3>Stock: {{this.stock}}</h3>
+        <button>Agregar al carrito</button>
       </div>
     {{/each}}
+  </div>
+  <div class="pagingContainer">
+    {{#if hasPrevPage}}
+      <a href={{prevLink}}>Anterior</a>
+    {{/if}}
+    <span>Página: {{page}}</span>
+    {{#if hasNextPage}}
+      <a href={{nextLink}}>Siguiente</a>
+    {{/if}}
   </div>
 </div>

@@ -6,14 +6,14 @@ export default class CartManager {
   };
 
   getCartById = (id) => {
-    return cartModel.findById(id);
+    return cartModel.findById(id).lean();
   };
 
   createCart = (products) => {
     return cartModel.create(products);
   };
 
-  addProductToCart = (id, cart) => {
+  updateCart = (id, cart) => {
     return cartModel.findByIdAndUpdate(id, cart);
   };
 }

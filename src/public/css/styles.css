@@ -1,12 +1,21 @@
 .productsContainer {
   display: flex;
   justify-content: space-evenly;
-  gap: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .product {
   border: solid 2px black;
   text-align: center;
   padding: 15px;
+  width: 30%;
+}
+
+.pagingContainer {
   width: 100%;
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }

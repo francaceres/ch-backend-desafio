@@ -10,17 +10,38 @@ const productRouter = (io) => {
     .route("/")
 
     .get(async (req, res) => {
-      let data = await productsManager.getProducts();
-      const { limit } = req.query;
-      if (limit) {
-        data = data.slice(0, limit);
+      let { limit = 10, page = 1, filter = null, sort = null } = req.query;
+      if (filter) {
+        filter = JSON.parse(filter);
       }
-      res.status(200).json({ status: "ok", data: data });
+
+      const { docs, hasPrevPage, hasNextPage, prevPage, nextPage, ...rest } =
+        await productsManager.paginateProducts(limit, page, filter, sort);
+
+      let prevLink,
+        nextLink = null;
+      if (hasPrevPage) {
+        prevLink = `/?page=${prevPage}`;
+      }
+      if (hasNextPage) {
+        nextLink = `/?page=${nextPage}`;
+      }
+
+      res.status(200).json({
+        status: "ok",
+        data: docs,
+        page: rest.page,
+        hasPrevPage,
+        hasNextPage,
+        prevPage,
+        nextPage,
+        prevLink,
+        nextLink,
+      });
     })
 
     .post(async (req, res) => {
-      const { title, description, price, status, thumbnails, code, stock } =
-        req.body;
+      const { title, description, price, code, stock } = req.body;
 
       if (!title || !description || !price || !code || !stock) {
         return res
@@ -43,8 +64,7 @@ const productRouter = (io) => {
     })
 
     .put(async (req, res) => {
-      const { title, description, price, status, thumbnails, code, stock } =
-        req.body;
+      const { title, description, price, code, stock } = req.body;
       if (!title || !description || !price || !code || !stock) {
         return res
           .status(400)
