@@ -1,5 +1,11 @@
 <div>
-  <h1>Products</h1>
+  <h1>Productos</h1>
+  {{#if user}}
+    <h2>¡Bienvenido {{user.name}}!</h2>
+    <button id="logoutBtn">Logout</button>
+  {{else}}
+    <h2>¡Bienvenido!</h2>
+  {{/if}}
   <div class="productsContainer">
     {{#each products}}
       <div class="product">
@@ -23,3 +29,5 @@
     {{/if}}
   </div>
 </div>
+
+<script src="./js/index.js"></script>

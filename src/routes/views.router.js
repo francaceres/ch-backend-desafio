@@ -7,6 +7,20 @@ const router = Router();
 const productsManager = new ProductManager();
 const cartsManager = new CartManager();
 
+const authLoggedIn = (req, res, next) => {
+  if (req.session.user) {
+    return next();
+  }
+  return res.render("error");
+};
+
+const authNotLoggedIn = (req, res, next) => {
+  if (!req.session.user) {
+    return next();
+  }
+  return res.render("error");
+};
+
 const viewsRouter = (io) => {
   router.get("/", async (req, res) => {
     let { limit = 10, page = 1, filter = null, sort = null } = req.query;
@@ -36,7 +50,24 @@ const viewsRouter = (io) => {
       prevLink,
       nextLink,
       style: "styles.css",
+      user: req.session.user,
     });
+  });
+
+  router.get("/register", authNotLoggedIn, (req, res) => {
+    res.render("register", { style: "styles.css" });
+  });
+
+  router.get("/login", authNotLoggedIn, (req, res) => {
+    res.render("login", { style: "styles.css" });
+  });
+
+  router.get("/profile", authLoggedIn, (req, res) => {
+    if (req.session.user) {
+      res.render("profile", { user: req.session.user });
+    } else {
+      res.render("error");
+    }
   });
 
   router.get("/realtimeproducts", async (req, res) => {

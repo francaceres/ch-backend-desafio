@@ -1,49 +1,58 @@
-const socket = io();
+// Login handler
 
-socket.on("productUpdate", (data) => {
-  const productsContainer = document.querySelector(".productsContainer");
-  let products = "";
-  data.forEach((prod) => {
-    products += `<div class="product">
-    <h2>${prod.id} - ${prod.title}</h2>
-    <p>${prod.description}</p>
-    <h3>$${prod.price}</h3>
-    <h3>Code: ${prod.code}</h3>
-    <h3>Stock: ${prod.stock}</h3></div>`;
+const loginForm = document.getElementById("loginForm");
+
+if (loginForm) {
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(loginForm);
+    const obj = {};
+    data.forEach((value, key) => (obj[key] = value));
+    const response = await fetch("/api/sessions/login", {
+      method: "POST",
+      body: JSON.stringify(obj),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const responseData = await response.json();
+    if (responseData.status === "ok") window.location.replace("/");
+    else alert("Ups! " + responseData.message);
   });
-  productsContainer.innerHTML = products;
-});
+}
 
-let user;
-let chatBox = document.getElementById("chatBox");
-let chatBoxInput = document.getElementById("chatBoxInput");
+// Logout handler
 
-Swal.fire({
-  title: "Por favor ingresá tu email",
-  input: "email",
-  text: "Email:",
-  inputValidator: (value) => {
-    if (!value) {
-      return "El email no debe estar vacío";
-    }
-  },
-  allowOutsideClick: false,
-}).then((result) => {
-  user = result.value;
-  socket.emit("login", {});
-});
+const logoutBtn = document.getElementById("logoutBtn");
 
-chatBox.addEventListener("submit", (e) => {
-  e.preventDefault();
-  socket.emit("message", { user, message: chatBoxInput.value });
-  chatBoxInput.value = "";
-});
-
-socket.on("messageLogs", (data) => {
-  let messageLogs = document.getElementById("messageLogs");
-  let messages = "";
-  data.forEach((message) => {
-    messages += `<p><strong>${message.user}: </strong>${message.message}</p>`;
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async () => {
+    const response = await fetch("/api/sessions/logout");
+    const responseData = await response.json();
+    if (responseData.status === "ok") window.location.replace("/login");
+    else alert("Ups! " + responseData.message);
   });
-  messageLogs.innerHTML = messages;
-});
+}
+
+// Register handler
+
+const registerForm = document.getElementById("registerForm");
+
+if (registerForm) {
+  registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const data = new FormData(registerForm);
+    const obj = {};
+    data.forEach((value, key) => (obj[key] = value));
+    console.log(data);
+    const response = await fetch("api/sessions/register", {
+      method: "POST",
+      body: JSON.stringify(obj),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const responseData = await response.json();
+    if (responseData.status === "ok") window.location.replace("/login");
+  });
+}
