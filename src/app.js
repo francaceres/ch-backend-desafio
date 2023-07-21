@@ -10,9 +10,12 @@ import sessions from "./routes/sessions.router.js";
 import __dirname from "./utils.js";
 import { Server } from "socket.io";
 import MessageManager from "./dao/mongo/manager/messages.js";
+
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
+import passport from "passport";
+import initializePassport from "./config/passport.config.js";
 
 const app = express();
 const connection = await mongoose.connect(
@@ -44,6 +47,9 @@ app.use(
     saveUninitialized: true,
   })
 );
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/api/products", products(io));
 app.use("/api/carts", carts);

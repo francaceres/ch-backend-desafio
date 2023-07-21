@@ -7,4 +7,7 @@ export default class UserManager {
   getUser = (data) => {
     return userModel.findOne(data);
   };
+  getUserById = (id) => {
+    return userModel.findById(id);
+  };
 }

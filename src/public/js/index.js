@@ -15,9 +15,9 @@ if (loginForm) {
         "Content-Type": "application/json",
       },
     });
-    const responseData = await response.json();
-    if (responseData.status === "ok") window.location.replace("/");
-    else alert("Ups! " + responseData.message);
+    // const responseData = await response.json();
+    if (response.ok) window.location.replace("/");
+    else alert("Ups! " + response.statusText);
   });
 }
 
