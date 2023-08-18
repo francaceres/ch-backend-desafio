@@ -1,6 +1,8 @@
 import cartModel from "../models/cart.js";
 
-export default class CartManager {
+export default class CartMongoManager {
+  constructor() {}
+
   getCarts = () => {
     return cartModel.find().lean();
   };

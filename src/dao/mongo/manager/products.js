@@ -1,6 +1,8 @@
 import productModel from "../models/product.js";
 
-export default class ProductManager {
+export default class ProductMongoManager {
+  constructor() {}
+
   getProducts = () => {
     return productModel.find().lean();
   };

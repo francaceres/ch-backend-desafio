@@ -1,11 +1,9 @@
 import express from "express";
-import mongoose from "mongoose";
 import handlebars from "express-handlebars";
+import mongoConnect from "../db/index.js";
 
-import products from "./routes/products.router.js";
-import carts from "./routes/carts.router.js";
+import router from "./routes/index.js";
 import views from "./routes/views.router.js";
-import sessions from "./routes/sessions.router.js";
 
 import __dirname from "./utils.js";
 import { Server } from "socket.io";
@@ -17,13 +15,14 @@ import MongoStore from "connect-mongo";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 
+import config from "./config/app.config.js";
+
 const app = express();
-const connection = await mongoose.connect(
-  "mongodb+srv://francaceres98:coderhouse@cluster0.bvjpru0.mongodb.net/?retryWrites=true&w=majority"
+const PORT = config.PORT;
+const httpServer = app.listen(PORT, () =>
+  console.log(`Listening on port ${PORT}`)
 );
-const httpServer = app.listen(8080, () =>
-  console.log("Listening on port 8080")
-);
+const connection = await mongoConnect();
 const io = new Server(httpServer);
 
 app.engine("handlebars", handlebars.engine());
@@ -38,11 +37,10 @@ app.use(cookieParser());
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl:
-        "mongodb+srv://francaceres98:coderhouse@cluster0.bvjpru0.mongodb.net/?retryWrites=true&w=majority",
+      mongoUrl: config.MONGO_URL,
       ttl: 10000,
     }),
-    secret: "coder secret",
+    secret: config.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
   })
@@ -51,9 +49,7 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/products", products(io));
-app.use("/api/carts", carts);
-app.use("/api/sessions", sessions);
+app.use("/api", router);
 app.use("/", views(io));
 
 const messagesManager = new MessageManager();
