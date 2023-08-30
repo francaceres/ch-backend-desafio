@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UserManager from "../dao/mongo/manager/users.js";
 import passport from "passport";
+import UserDTO from "../dao/DTOs/User.dto.js";
 
 const router = Router();
 
@@ -17,22 +18,19 @@ router.get("/failregister", async (req, res) => {
   res.status(400).json({ status: "Error", message: "Failed strategy" });
 });
 
-router.post(
-  "/login",
-  passport.authenticate("login", { failureRedirect: "/faillogin" }),
-  async (req, res) => {
-    if (!req.user) {
-      return res
-        .status(401)
-        .json({ status: "Error", message: "Invalid credentials" });
-    }
-    req.session.user = {
-      name: req.user.name,
-      email: req.user.email,
-    };
-    res.status(200).json({ status: "ok" });
+router.post("/login", passport.authenticate("login"), async (req, res) => {
+  if (!req.user) {
+    return res
+      .status(401)
+      .json({ status: "Error", message: "Invalid credentials" });
   }
-);
+  req.session.user = {
+    name: req.user.name,
+    email: req.user.email,
+    role: req.user.role,
+  };
+  res.status(200).json({ status: "ok" });
+});
 router.get("/faillogin", (req, res) => {
   res.status(400).json({ status: "Error", message: "Failed login" });
 });
@@ -50,6 +48,17 @@ router.get(
     res.redirect("/");
   }
 );
+
+router.get("/current", async (req, res) => {
+  if (req.session.user) {
+    const user = new UserDTO(req.session.user);
+    res.status(200).json({ status: "ok", user });
+  } else {
+    res
+      .status(404)
+      .json({ status: "not found", message: "No user authenticated" });
+  }
+});
 
 router.get("/logout", async (req, res) => {
   req.session.destroy((err) => {

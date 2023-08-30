@@ -1,4 +1,4 @@
-import { productsService } from "../services/index.js";
+import { productsService } from "../repositories/index.js";
 
 const getProducts = async (req, res) => {
   let { limit = 10, page = 1, filter = null, sort = null } = req.query;

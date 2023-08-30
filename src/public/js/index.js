@@ -8,6 +8,7 @@ if (loginForm) {
     const data = new FormData(loginForm);
     const obj = {};
     data.forEach((value, key) => (obj[key] = value));
+    console.log(obj);
     const response = await fetch("/api/sessions/login", {
       method: "POST",
       body: JSON.stringify(obj),

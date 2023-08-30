@@ -1,4 +1,10 @@
-import { cartsService } from "../services/index.js";
+import TicketDTO from "../dao/DTOs/Ticket.dto.js";
+import {
+  cartsService,
+  productsService,
+  ticketsService,
+} from "../repositories/index.js";
+import { v4 as uuidv4 } from "uuid";
 
 const createCart = async (req, res) => {
   const { products } = req.body;
@@ -80,6 +86,32 @@ const updateQuantityOfProduct = async (req, res) => {
   res.status(200).json({ status: "ok", data: cart });
 };
 
+const purchaseCart = async (req, res) => {
+  const { cid } = req.params;
+  const { purchaser } = req.body;
+  const cart = await cartsService.getCartById(cid).populate("products.product");
+  const notInStock = [];
+  let amount = 0;
+  const updatePromises = cart.products.map(async (e, index) => {
+    const product = e.product;
+    if (e.quantity <= product.stock) {
+      product.stock -= e.quantity;
+      await productsService.updateProduct(product._id, product);
+      amount += product.price * e.quantity;
+    } else {
+      notInStock.push(product._id);
+      cart.products.splice(index, 1);
+    }
+  });
+  await Promise.all(updatePromises);
+  const code = uuidv4();
+  const datetime = new Date();
+  const ticket = new TicketDTO({ code, datetime, amount, purchaser });
+  await cartsService.updateCart(cid, cart);
+  const result = await ticketsService.createTicket(ticket);
+  res.status(201).json({ status: "ok", data: result, notInStock });
+};
+
 export default {
   createCart,
   getCartById,
@@ -88,4 +120,5 @@ export default {
   addProductToCart,
   deleteProductFromCart,
   updateQuantityOfProduct,
+  purchaseCart,
 };
