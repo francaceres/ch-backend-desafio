@@ -5,11 +5,22 @@ import {
   ticketsService,
 } from "../repositories/index.js";
 import { v4 as uuidv4 } from "uuid";
+import CustomErrors from "../utils/errors/Custom.errors.js";
+import {
+  getElementError,
+  missingProductsError,
+} from "../utils/errors/Info.errors.js";
+import EnumErrors from "../utils/errors/Enum.errors.js";
 
 const createCart = async (req, res) => {
   const { products } = req.body;
   if (!products) {
-    return res.status(400).json({ status: "error", message: "Missing data" });
+    CustomErrors.createError({
+      name: "Missing data error",
+      cause: missingProductsError(products),
+      message: "Missing data required to create cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
   }
   const addedCart = await cartsService.createCart(req.body);
   res.status(201).json({ status: "ok", data: addedCart });
@@ -18,6 +29,14 @@ const createCart = async (req, res) => {
 const getCartById = async (req, res) => {
   const { cid } = req.params;
   const cart = await cartsService.getCartById(cid).populate("products.product");
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   res.status(200).json({ status: "ok", data: cart });
 };
 
@@ -25,9 +44,22 @@ const updateCart = async (req, res) => {
   const { cid } = req.params;
   const { products } = req.body;
   if (!products) {
-    return res.status(400).json({ status: "error", message: "Missing data" });
+    CustomErrors.createError({
+      name: "Missing data error",
+      cause: missingProductsError(products),
+      message: "Missing data required to create cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
   }
   const cart = await cartsService.getCartById(cid);
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   cart.products = products;
   await cartsService.updateCart(cid, cart);
   res.status(200).json({ status: "ok", data: cart });
@@ -36,6 +68,14 @@ const updateCart = async (req, res) => {
 const deleteCart = async (req, res) => {
   const { cid } = req.params;
   const cart = await cartsService.getCartById(cid);
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   cart.products = [];
   await cartsService.updateCart(cid, cart);
   res.sendStatus(204);
@@ -44,6 +84,14 @@ const deleteCart = async (req, res) => {
 const addProductToCart = async (req, res) => {
   const { cid, pid } = req.params;
   const cart = await cartsService.getCartById(cid);
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   const product = cart.products.find((prod) => prod.product == pid);
   if (product) {
     const indexProduct = cart.products.indexOf(product);
@@ -58,6 +106,14 @@ const addProductToCart = async (req, res) => {
 const deleteProductFromCart = async (req, res) => {
   const { cid, pid } = req.params;
   const cart = await cartsService.getCartById(cid);
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   const product = cart.products.find((prod) => prod.product == pid);
   if (!product) {
     return res
@@ -73,6 +129,14 @@ const deleteProductFromCart = async (req, res) => {
 const updateQuantityOfProduct = async (req, res) => {
   const { cid, pid } = req.params;
   const cart = await cartsService.getCartById(cid);
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   const product = cart.products.find((prod) => prod.product == pid);
   if (!product) {
     return res
@@ -90,6 +154,14 @@ const purchaseCart = async (req, res) => {
   const { cid } = req.params;
   const { purchaser } = req.body;
   const cart = await cartsService.getCartById(cid).populate("products.product");
+  if (!cart) {
+    CustomErrors.createError({
+      name: "Find cart error",
+      cause: getElementError("cart", cid),
+      message: "Error trying to find cart",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   const notInStock = [];
   let amount = 0;
   const updatePromises = cart.products.map(async (e, index) => {

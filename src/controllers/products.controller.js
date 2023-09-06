@@ -1,4 +1,11 @@
 import { productsService } from "../repositories/index.js";
+import CustomErrors from "../utils/errors/Custom.errors.js";
+import EnumErrors from "../utils/errors/Enum.errors.js";
+import {
+  createProductErrorInfo,
+  getElementError,
+} from "../utils/errors/Info.errors.js";
+import { generateProduct } from "../utils/utils.js";
 
 const getProducts = async (req, res) => {
   let { limit = 10, page = 1, filter = null, sort = null } = req.query;
@@ -29,9 +36,21 @@ const getProducts = async (req, res) => {
 };
 
 const addProduct = async (req, res) => {
-  const { title, description, price, code, stock } = req.body;
-  if (!title || !description || !price || !code || !stock) {
-    return res.status(400).json({ status: "error", message: "Missing data" });
+  const { title, category, description, price, code, stock } = req.body;
+  if (!title || !category || !description || !price || !code || !stock) {
+    CustomErrors.createError({
+      name: "Product creation error",
+      cause: createProductErrorInfo({
+        title,
+        category,
+        description,
+        price,
+        code,
+        stock,
+      }),
+      message: "Error trying to create product",
+      code: EnumErrors.INVALID_TYPES_ERROR,
+    });
   }
   const product = req.body;
   const addedProduct = await productsService.addProduct(product);
@@ -42,13 +61,33 @@ const addProduct = async (req, res) => {
 const getProductById = async (req, res) => {
   const { pid } = req.params;
   const product = await productsService.getProductById(pid);
+  if (!product) {
+    CustomErrors.createError({
+      name: "Find product error",
+      cause: getElementError("product", pid),
+      message: "Error trying to find product",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
   res.status(200).json({ status: "ok", data: product });
 };
 
 const updateProduct = async (req, res) => {
-  const { title, description, price, code, stock } = req.body;
-  if (!title || !description || !price || !code || !stock) {
-    return res.status(400).json({ status: "error", message: "Missing data" });
+  const { title, category, description, price, code, stock } = req.body;
+  if (!title || !category || !description || !price || !code || !stock) {
+    CustomErrors.createError({
+      name: "Product update error",
+      cause: createProductErrorInfo({
+        title,
+        category,
+        description,
+        price,
+        code,
+        stock,
+      }),
+      message: "Error trying to update product",
+      code: EnumErrors.INVALID_TYPES_ERROR,
+    });
   }
   const { pid } = req.params;
   const newProduct = req.body;
@@ -64,10 +103,19 @@ const deleteProduct = async (req, res) => {
   // io.emit("productUpdate", await productsManager.getProducts());
 };
 
+const getMockedProducts = async (req, res) => {
+  let products = [];
+  for (let i = 0; i < 100; i++) {
+    products.push(generateProduct());
+  }
+  res.status(200).json({ status: "ok", products });
+};
+
 export default {
   getProducts,
   addProduct,
   getProductById,
   updateProduct,
   deleteProduct,
+  getMockedProducts,
 };

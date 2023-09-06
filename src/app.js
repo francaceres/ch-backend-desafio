@@ -5,7 +5,7 @@ import mongoConnect from "../db/index.js";
 import router from "./routes/index.js";
 import views from "./routes/views.router.js";
 
-import __dirname from "./utils.js";
+import __dirname from "./utils/utils.js";
 import { Server } from "socket.io";
 import MessageManager from "./dao/mongo/manager/messages.js";
 
@@ -16,6 +16,8 @@ import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 
 import config from "./config/app.config.js";
+
+import errorHandler from "./middlewares/errors/index.js";
 
 const app = express();
 const PORT = config.PORT;
@@ -51,6 +53,8 @@ app.use(passport.session());
 
 app.use("/api", router);
 app.use("/", views(io));
+
+app.use(errorHandler);
 
 const messagesManager = new MessageManager();
 
