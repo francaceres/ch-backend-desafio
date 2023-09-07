@@ -18,6 +18,7 @@ import initializePassport from "./config/passport.config.js";
 import config from "./config/app.config.js";
 
 import errorHandler from "./middlewares/errors/index.js";
+import { addLogger } from "./utils/logger.js";
 
 const app = express();
 const PORT = config.PORT;
@@ -34,6 +35,8 @@ app.use(express.static(__dirname + "/public"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(errorHandler);
+app.use(addLogger);
 
 app.use(cookieParser());
 app.use(
@@ -53,8 +56,6 @@ app.use(passport.session());
 
 app.use("/api", router);
 app.use("/", views(io));
-
-app.use(errorHandler);
 
 const messagesManager = new MessageManager();
 

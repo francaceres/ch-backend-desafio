@@ -16,7 +16,7 @@ const productsRouter = () => {
     .route("/:pid")
     .get(productsController.getProductById)
     .put(productsController.updateProduct)
-    .delete(productsController.deleteProduct);
+    .delete(checkRole("admin"), productsController.deleteProduct);
 
   return router;
 };
