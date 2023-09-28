@@ -1,5 +1,6 @@
 import { Router } from "express";
 import cartsController from "../controllers/carts.controller.js";
+import { checkRole } from "../middlewares/index.js";
 
 const router = Router();
 
@@ -15,7 +16,7 @@ router.post("/:cid/purchase", cartsController.purchaseCart);
 
 router
   .route("/:cid/product/:pid")
-  .post(cartsController.addProductToCart)
+  .post(checkRole("user"), cartsController.addProductToCart)
   .delete(cartsController.deleteProductFromCart)
   .put(cartsController.updateQuantityOfProduct);
 

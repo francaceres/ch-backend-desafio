@@ -13,5 +13,4 @@ export default (error, req, res, next) => {
     default:
       res.json({ status: "error", error: "Unhandled error" });
   }
-  next();
 };

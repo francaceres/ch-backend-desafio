@@ -54,9 +54,7 @@ router.get("/current", async (req, res) => {
     const user = new UserDTO(req.session.user);
     res.status(200).json({ status: "ok", user });
   } else {
-    res
-      .status(404)
-      .json({ status: "not found", message: "No user authenticated" });
+    res.json({ status: "not found", message: "No user authenticated" });
   }
 });
 

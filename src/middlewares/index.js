@@ -8,7 +8,7 @@ export const checkRole = (role) => {
       );
       const userData = response.data;
 
-      if (!userData) {
+      if (userData.status == "not found") {
         return res
           .status(401)
           .json({ status: "error", message: "User not found" });

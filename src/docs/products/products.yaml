@@ -1,0 +1,217 @@
+openapi: "3.1.0"
+info:
+  title: API Products
+  version: "1.0"
+paths:
+  /api/products/:
+    get:
+      summary: "Obtiene todos los productos"
+      tags:
+        - Products
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          description: La cantidad de productos que se obtienen
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: La página que se obtendrá del listado de productos
+        - in: query
+          name: filter
+          schema:
+            type: object
+          description: Filtro de los productos retornados
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: El orden en que se retornan los productos, de acuerdo a una propiedad escogida. "propiedad" para ascendente y "-propiedad" para descendente
+      responses:
+        "200":
+          description: Todos los productos fueron obtenidos
+        "500":
+          description: Error del servidor
+    post:
+      summary: "Agrega un producto"
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/addProduct"
+      responses:
+        "201":
+          description: Producto creado
+        "401":
+          description: No autenticado para la creación de un producto
+        "403":
+          description: El usuario no cuenta con los permisos para la creación de un producto
+  /api/products/mockingproducts/:
+    get:
+      summary: "Obtiene 100 productos mockeados"
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Todos los productos fueron obtenidos
+        "500":
+          description: Error del servidor
+  /api/products/{pid}/:
+    get:
+      summary: Obtiene un producto
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se busca
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    put:
+      summary: Actualiza un producto
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se busca
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateProduct"
+      responses:
+        "200":
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+    delete:
+      summary: Elimina un producto
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se busca
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Producto eliminado
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id de mongo
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        status:
+          type: boolean
+          description: Estado del producto
+        thumbnails:
+          type: array
+          description: Arreglo de imágenes del producto
+        code:
+          type: string
+          description: Código único del producto
+      example:
+        _id: "64a82c3ca87013394e815f3e"
+        title: "Gorra 1"
+        description: "Gorra azul bordada"
+        price: 7000
+        status: true
+        thumbnails: []
+        code: "CAP1"
+        stock: 10
+        category: "cap"
+  requestBodies:
+    addProduct:
+      description: Body con la información del producto a crear
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        status:
+          type: boolean
+          description: Estado del producto
+        thumbnails:
+          type: array
+          description: Arreglo de imágenes del producto
+        code:
+          type: string
+          description: Código único del producto
+      example:
+        title: "Gorra 1"
+        description: "Gorra azul bordada"
+        price: 7000
+        status: true
+        thumbnails: []
+        code: "CAP1"
+        stock: 10
+        category: "cap"
+    updateProduct:
+      description: Body con la información del producto a actualizar
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        status:
+          type: boolean
+          description: Estado del producto
+        thumbnails:
+          type: array
+          description: Arreglo de imágenes del producto
+        code:
+          type: string
+          description: Código único del producto
+      example:
+        title: "Gorra 1"
+        description: "Gorra azul bordada"
+        price: 7000
+        status: true
+        thumbnails: []
+        code: "CAP1"
+        stock: 10
+        category: "cap"

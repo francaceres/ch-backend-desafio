@@ -1,0 +1,287 @@
+openapi: "3.1.0"
+info:
+  title: API Carts
+  version: "1.0"
+paths:
+  /api/carts/:
+    post:
+      summary: "Crea un carrito"
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/createCart"
+      responses:
+        "201":
+          description: Carrito creado
+  /api/carts/{cid}:
+    get:
+      summary: Obtiene un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se busca
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Carrito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    put:
+      summary: Actualiza los productos del carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se quiere actualizar
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateCart"
+      responses:
+        "200":
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    delete:
+      summary: Elimina los productos de un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se quiere vaciar
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Carrito vaciado
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Registra la compra de un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se quiere comprar
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/purchaseCart"
+      responses:
+        "201":
+          description: Compra realizada con éxito
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ticket"
+  /api/carts/{cid}/product/{pid}:
+    post:
+      summary: Agrega un producto al carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que al que se quiere agregar el producto
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se quiere agregar al carrito
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    delete:
+      summary: Elimina un producto del carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que del que se quiere eliminar el producto
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se quiere eliminar del carrito
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+    put:
+      summary: Actualiza la cantidad de un producto del carrito
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que que se quiere actualizar
+          schema:
+            type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se quiere actualizar
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/requestBodies/updateQuantityOfProduct"
+      responses:
+        "200":
+          description: Carrito actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id de mongo
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              product:
+                type: ObjectId
+              quantity:
+                type: number
+        __v:
+          type: number
+      example:
+        {
+          _id: "64adbadcc96771f29ba14325",
+          products:
+            [
+              {
+                product: "64a2e3d9e723115b195aa15a",
+                quantity: 3,
+                _id: "64ecefbcfecccad17f4e3f2c",
+              },
+            ],
+          __v: 0,
+        }
+    Ticket:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+        code:
+          type: string
+        purchase_datetime:
+          type: string
+        amount:
+          type: number
+        purchaser:
+          type: string
+        __v:
+          type: number
+      example:
+        {
+          _id: "64ecefd2fecccad17f4e3f3e",
+          code: "7616babe-acb6-4fb2-b8c9-da46d1b9c7e1",
+          purchase_datetime: "Mon Aug 28 2023 16:04:50 GMT-0300 (hora estándar de Argentina)",
+          amount: 48000,
+          purchaser: "juanperez@mail.com",
+          __v: 0,
+        }
+  requestBodies:
+    createCart:
+      description: Body con la información del carrito a crear
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            description: Producto a agregar al carrito
+            properties:
+              product:
+                type: ObjectId
+                description: Id de mongo del producto
+              quantity:
+                type: number
+                description: Cantidad del producto que se agrega al carrito
+      example:
+        products: [{ product: "64a2e3d9e723115b195aa15a", quantity: 3 }]
+    updateCart:
+      description: Body con la información del carrito a crear
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            description: Producto a agregar al carrito
+            properties:
+              product:
+                type: ObjectId
+                description: Id de mongo del producto
+              quantity:
+                type: number
+                description: Cantidad del producto que se agrega al carrito
+      example:
+        products: [{ product: "64a2e3d9e723115b195aa15a", quantity: 3 }]
+    purchaseCart:
+      description: Body con la información del comprador de un carrito
+      properties:
+        purchaser:
+          type: string
+          description: Email del comprador del carrito
+      example:
+        purchaser: "juanperez@mail.com"
+    updateQuantityOfProduct:
+      description: Body con la cantidad que se desea actualizar de un producto
+      properties:
+        quantity:
+          type: number
+          description: número con la cantidad del producto a actualizar
+      example:
+        quantity: 3
