@@ -1,14 +1,14 @@
 import passport from "passport";
 import local from "passport-local";
 import GitHubStrategy from "passport-github2";
-import UserManager from "../dao/mongo/manager/users.js";
+import UserMongoManager from "../dao/mongo/manager/users.js";
 import { createHash, isValidPassword } from "../utils/utils.js";
 import config from "./app.config.js";
 import CustomErrors from "../utils/errors/Custom.errors.js";
 import { generateUserErrorInfo } from "../utils/errors/Info.errors.js";
 import EnumErrors from "../utils/errors/Enum.errors.js";
 
-const userManager = new UserManager();
+const userManager = new UserMongoManager();
 
 const LocalStrategy = local.Strategy;
 const initializePassport = () => {
@@ -37,6 +37,7 @@ const initializePassport = () => {
             name,
             email,
             password: createHash(password),
+            last_connection: new Date(),
           };
           let result = await userManager.registerUser(newUser);
           return done(null, result);
@@ -62,6 +63,8 @@ const initializePassport = () => {
           if (!isValidPassword(user, password)) {
             return done(null, false, { message: "User or password invalid" });
           }
+          user.last_connection = new Date();
+          await userManager.updateUser(user._id, user);
           return done(null, user);
         } catch (error) {
           return done("Error al obtener el usuario" + error);
@@ -88,10 +91,13 @@ const initializePassport = () => {
               name: profile._json.name,
               email: profile._json.email,
               password: "",
+              last_connection: new Date(),
             };
             const result = await userManager.registerUser(newUser);
             done(null, result);
           } else {
+            user.last_connection = new Date();
+            await userManager.updateUser(user._id, user);
             done(null, user);
           }
         } catch (error) {

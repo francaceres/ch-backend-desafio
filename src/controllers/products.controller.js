@@ -1,3 +1,4 @@
+import config from "../config/app.config.js";
 import { productsService } from "../repositories/index.js";
 import CustomErrors from "../utils/errors/Custom.errors.js";
 import EnumErrors from "../utils/errors/Enum.errors.js";
@@ -5,7 +6,7 @@ import {
   createProductErrorInfo,
   getElementError,
 } from "../utils/errors/Info.errors.js";
-import { generateProduct } from "../utils/utils.js";
+import { generateProduct, mailerTransport } from "../utils/utils.js";
 
 const getProducts = async (req, res) => {
   let { limit = 10, page = 1, filter = null, sort = null } = req.query;
@@ -98,8 +99,35 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
   const { pid } = req.params;
+  const user = req.session.user;
+  const product = await productsService.getProductById(pid);
+  if (!product) {
+    CustomErrors.createError({
+      name: "Find product error",
+      cause: getElementError("product", pid),
+      message: "Error trying to find product",
+      code: EnumErrors.ERROR_ROUTING,
+    });
+  }
+  if (product.owner !== user.email && user.role !== "Admin") {
+    return res.status(403).json({
+      status: "error",
+      message: "You cannot delete another owner's product",
+    });
+  }
+  if (product.owner !== "Admin") {
+    await mailerTransport.sendMail({
+      from: `Coder Ecommerce <${config.GMAIL_USER}>`,
+      to: product.owner,
+      subject: `Tu producto: ${product.title} ha sido eliminado`,
+      html: `<div>
+        <h1>Tu producto ha sido eliminado del sitio Coder Ecommerce</h1>
+      </div>`,
+    });
+  }
   await productsService.deleteProduct(pid);
-  res.sendStatus(204);
+  return res.sendStatus(204);
+
   // io.emit("productUpdate", await productsManager.getProducts());
 };
 

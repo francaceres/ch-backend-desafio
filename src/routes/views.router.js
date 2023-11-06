@@ -1,6 +1,8 @@
 import { Router } from "express";
 import ProductManager from "../dao/mongo/manager/products.js";
 import CartManager from "../dao/mongo/manager/carts.js";
+import { ticketsService, usersService } from "../repositories/index.js";
+import { checkRole } from "../middlewares/index.js";
 
 const router = Router();
 
@@ -84,7 +86,23 @@ const viewsRouter = (io) => {
     const data = await cartsManager
       .getCartById(cid)
       .populate("products.product");
-    res.render("cart", { cart: data, style: "styles.css" });
+    let totalPrice = 0;
+    data.products.forEach((prod) => {
+      totalPrice += prod.product.price * prod.quantity;
+    });
+    res.render("cart", { cart: data, totalPrice, style: "styles.css" });
+  });
+
+  router.get("/user/:uid", checkRole(["Admin"]), async (req, res) => {
+    const { uid } = req.params;
+    const user = await usersService.getUserById(uid);
+    res.render("userAdmin", { user: user, style: "styles.css" });
+  });
+
+  router.get("/ticket/:tcode", async (req, res) => {
+    const { tcode } = req.params;
+    const ticket = await ticketsService.getTicket(tcode);
+    res.render("ticket", { ticket });
   });
 
   return router;

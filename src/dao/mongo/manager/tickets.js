@@ -6,4 +6,8 @@ export default class TicketMongoManager {
   createTicket = (ticket) => {
     return ticketModel.create(ticket);
   };
+
+  getTicket = (code) => {
+    return ticketModel.findOne({ code }).lean();
+  };
 }

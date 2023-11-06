@@ -3,3 +3,11 @@
 {"level":"error","message":"Error log test"}
 {"level":"warning","message":"Warning log test"}
 {"level":"info","message":"Info log test"}
+{"level":"fatal","message":"Fatal log test"}
+{"level":"error","message":"Error log test"}
+{"level":"warning","message":"Warning log test"}
+{"level":"info","message":"Info log test"}
+{"level":"fatal","message":"Fatal log test"}
+{"level":"error","message":"Error log test"}
+{"level":"warning","message":"Warning log test"}
+{"level":"info","message":"Info log test"}

@@ -152,7 +152,7 @@ const updateQuantityOfProduct = async (req, res) => {
 
 const purchaseCart = async (req, res) => {
   const { cid } = req.params;
-  const { purchaser } = req.body;
+  const purchaser = req.session.user.email;
   const cart = await cartsService.getCartById(cid).populate("products.product");
   if (!cart) {
     CustomErrors.createError({

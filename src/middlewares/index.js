@@ -1,27 +1,12 @@
-import axios from "axios";
+export const checkRole = (roles) => (req, res, next) => {
+  const user = req.session.user;
+  if (!user) {
+    return res.status(401).json({ status: "error", message: "User not found" });
+  }
 
-export const checkRole = (role) => {
-  return async (req, res, next) => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/api/sessions/current"
-      );
-      const userData = response.data;
+  if (!roles.includes(user.role)) {
+    return res.status(403).json({ status: "error", message: "Forbidden" });
+  }
 
-      if (userData.status == "not found") {
-        return res
-          .status(401)
-          .json({ status: "error", message: "User not found" });
-      }
-
-      if (userData.role !== role) {
-        return res.status(403).json({ status: "error", message: "Forbidden" });
-      }
-
-      next();
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ status: "error", message: error });
-    }
-  };
+  next();
 };

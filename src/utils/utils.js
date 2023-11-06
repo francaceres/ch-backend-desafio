@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import { faker } from "@faker-js/faker/locale/es";
+import nodemailer from "nodemailer";
+import config from "../config/app.config.js";
 
 export const createHash = (password) =>
   bcrypt.hashSync(password, bcrypt.genSaltSync(10));
@@ -20,3 +22,12 @@ export const generateProduct = () => {
     _id: faker.database.mongodbObjectId(),
   };
 };
+
+export const mailerTransport = nodemailer.createTransport({
+  service: "gmail",
+  port: 587,
+  auth: {
+    user: config.GMAIL_USER,
+    pass: config.GMAIL_PASS,
+  },
+});

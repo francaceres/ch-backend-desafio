@@ -1,5 +1,9 @@
 <div>
-  <h1>Cart - ID: {{cart._id}}</h1>
+  <h1>Carrito - ID: {{cart._id}}</h1>
+  <div>
+    <span>Total: ${{totalPrice}}</span>
+    <button id="purchaseBtn">Comprar</button>
+  </div>
   <div class="productsContainer">
     {{#each cart.products}}
       <div class="product">
@@ -11,3 +15,5 @@
     {{/each}}
   </div>
 </div>
+
+<script src="../js/index.js"></script>

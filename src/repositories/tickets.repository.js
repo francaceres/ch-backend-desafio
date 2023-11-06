@@ -6,4 +6,8 @@ export default class ticketRepository {
   createTicket = (code, purchase_datetime, amount, purchaser) => {
     return this.dao.createTicket(code, purchase_datetime, amount, purchaser);
   };
+
+  getTicket = (code) => {
+    return this.dao.getTicket(code);
+  };
 }

@@ -8,15 +8,15 @@ const productsRouter = () => {
   router
     .route("/")
     .get(productsController.getProducts)
-    .post(checkRole("admin"), productsController.addProduct);
+    .post(checkRole(["Admin", "Premium"]), productsController.addProduct);
 
   router.get("/mockingproducts", productsController.getMockedProducts);
 
   router
     .route("/:pid")
     .get(productsController.getProductById)
-    .put(checkRole("admin"), productsController.updateProduct)
-    .delete(checkRole("admin"), productsController.deleteProduct);
+    .put(checkRole(["Admin"]), productsController.updateProduct)
+    .delete(checkRole(["Admin", "Premium"]), productsController.deleteProduct);
 
   return router;
 };

@@ -4,7 +4,7 @@ import { checkRole } from "../middlewares/index.js";
 
 const router = Router();
 
-router.post("/", cartsController.createCart);
+router.post("/", checkRole(["User", "Premium"]), cartsController.createCart);
 
 router
   .route("/:cid")
@@ -16,7 +16,7 @@ router.post("/:cid/purchase", cartsController.purchaseCart);
 
 router
   .route("/:cid/product/:pid")
-  .post(checkRole("user"), cartsController.addProductToCart)
+  .post(checkRole(["User", "Premium"]), cartsController.addProductToCart)
   .delete(cartsController.deleteProductFromCart)
   .put(cartsController.updateQuantityOfProduct);
 

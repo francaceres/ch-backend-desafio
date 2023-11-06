@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: "User",
   },
+  last_connection: String,
 });
 
 const userModel = mongoose.model(usersCollection, userSchema);

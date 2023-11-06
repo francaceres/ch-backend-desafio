@@ -6,16 +6,17 @@
   {{else}}
     <h2>¡Bienvenido!</h2>
   {{/if}}
+  <div id="cart"></div>
   <div class="productsContainer">
     {{#each products}}
-      <div class="product">
+      <div class="product" id={{this._id}}>
         <h2>{{this.title}} - {{this._id}}</h2>
         <h3>{{this.category}}</h3>
         <p>{{this.description}}</p>
         <h3>${{this.price}}</h3>
         <h3>Code: {{this.code}}</h3>
         <h3>Stock: {{this.stock}}</h3>
-        <button>Agregar al carrito</button>
+        <button class="addToCartBtn">Agregar al carrito</button>
       </div>
     {{/each}}
   </div>
